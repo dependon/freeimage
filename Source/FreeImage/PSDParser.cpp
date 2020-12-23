@@ -1468,20 +1468,36 @@ FIBITMAP* psdParser::ReadImageData(FreeImageIO *io, fi_handle handle) {
 	switch ( nCompression ) {
 		case PSDP_COMPRESSION_NONE: // raw data
 		{
-			for(unsigned c = 0; c < nChannels; c++) {
-				if(c >= dstChannels) {
-					// @todo write extra channels
-					break;
-				}
+            if (dstBpp == 1 && bytes != 4 && bytes != 2 && nChannels > 0) {
+                for (unsigned c = 0; c < nChannels; c++) {
+                    if (c >= dstChannels) {
+                        // @todo write extra channels
+                        break;
+                    }
+                    const unsigned channelOffset = GetChannelOffset(bitmap, c) * bytes;
+                    BYTE* dst_line_start = dst_first_line + channelOffset;
+                    for (unsigned h = 0; h < nHeight; ++h, dst_line_start -= dstLineSize) {//<*** flipped
+                        io->read_proc(line_start, dstLineSize, 1, handle);
+                        ReadImageLine(dst_line_start, line_start, dstLineSize, dstBpp, bytes);
+                    } //< h
+                }//< ch
+            }
+            else {
+                for (unsigned c = 0; c < nChannels; c++) {
+                    if (c >= dstChannels) {
+                        // @todo write extra channels
+                        break;
+                    }
 
-				const unsigned channelOffset = GetChannelOffset(bitmap, c) * bytes;
+                    const unsigned channelOffset = GetChannelOffset(bitmap, c) * bytes;
 
-				BYTE* dst_line_start = dst_first_line + channelOffset;
-				for(unsigned h = 0; h < nHeight; ++h, dst_line_start -= dstLineSize) {//<*** flipped
-					io->read_proc(line_start, lineSize, 1, handle);
-					ReadImageLine(dst_line_start, line_start, lineSize, dstBpp, bytes);
-				} //< h
-			}//< ch
+                    BYTE* dst_line_start = dst_first_line + channelOffset;
+                    for (unsigned h = 0; h < nHeight; ++h, dst_line_start -= dstLineSize) {//<*** flipped
+                        io->read_proc(line_start, lineSize, 1, handle);
+                        ReadImageLine(dst_line_start, line_start, lineSize, dstBpp, bytes);
+                    } //< h
+                }//< ch
+            }
 
 			SAFE_DELETE_ARRAY(line_start);
 

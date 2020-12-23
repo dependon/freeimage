@@ -3,7 +3,7 @@
 //
 // Design and implementation by
 // - Floris van den Berg (flvdberg@wxs.nl)
-// - Hervé Drolon (drolon@infonie.fr)
+// - Hervï¿½ Drolon (drolon@infonie.fr)
 //
 // This file is part of FreeImage 3
 //
@@ -244,6 +244,10 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
 
 		int width  = GetInt(io, handle);
 		int height = GetInt(io, handle);
+		//width pr height may be negative
+		if(width < 0 ||height < 0){
+			return NULL;
+		}
 		int maxval = 1;
 
 		if((id_two == '2') || (id_two == '5') || (id_two == '3') || (id_two == '6')) {

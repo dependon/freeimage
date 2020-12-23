@@ -798,7 +798,11 @@ int psdThumbnail::Read(FreeImageIO *io, fi_handle handle, int iResourceSize, boo
 		for(unsigned h = 0; h < (unsigned)_Height; ++h, dst_line_start -= dstLineSize) {//<*** flipped
 			io->read_proc(line_start, _WidthBytes, 1, handle);
 			iTotalData -= _WidthBytes;
-			memcpy(dst_line_start, line_start, _Width * _BitPerPixel / 8);
+			int iBuffer=_Width * _BitPerPixel / 8;
+			if(iBuffer>_WidthBytes){
+				iBuffer=_WidthBytes;
+			}
+			memcpy(dst_line_start, line_start, iBuffer);
 		}
 #if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_BGR
 		SwapRedBlue32(_dib);

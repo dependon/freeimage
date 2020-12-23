@@ -329,6 +329,10 @@ LoadStandardIcon(FreeImageIO *io, fi_handle handle, int flags, BOOL header_only)
 	}
 
 	// read the icon
+	int realpitch =FreeImage_GetPitch(dib);
+	if(realpitch < pitch){
+		pitch=realpitch;
+	}
 	io->read_proc(FreeImage_GetBits(dib), height * pitch, 1, handle);
 
 #ifdef FREEIMAGE_BIGENDIAN
